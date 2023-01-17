@@ -82,7 +82,7 @@ fn parse(v: String) -> ParseResult {
         }
 
         let token_string = Some(token.to_string());
-        let test = Some(token.to_string());
+
         match token {
             Token::H265 | Token::H264 => {
                 result.video_codec = token_string;
@@ -119,4 +119,3 @@ fn main() {
     let result = parse("[TaigaSubs]_Toradora!_(2008)_-_01v2_-_Tiger_and_Dragon[1920x1080_H.265_FLAC_5.1_bluray][1234ABCD].mkv".to_string());
     dbg!(result);
 }
-
