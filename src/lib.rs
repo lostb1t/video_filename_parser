@@ -70,14 +70,16 @@ struct ParseResult {
     #[pyo3(get, set)]
     title: String,
     #[pyo3(get, set)]
-    videoCodec: Option<Token>,
+    video_codec: Option<Token>,
+    #[pyo3(get, set)]
+    file_name: String,
 }
 
 #[pymethods]
 impl ParseResult {
     #[new]
-    pub fn new() -> Self {
-        ParseResult::default()
+    pub fn new(file_name: String) -> Self {
+        ParseResult {file_name, ..ParseResult::default()}
     }
 }
 
@@ -93,14 +95,14 @@ impl ParseResult {
 #[pyfunction]
 fn parse(v: String) -> PyResult<ParseResult> {
     let s = v.clone().to_lowercase();
-    let mut lex = Token::lexer(&s);
+    let lex = Token::lexer(&s);
 
-    let mut result = ParseResult { title: s.clone(), ..Default::default() };
-    while let Some(token) = lex.next() {
+    let mut result = ParseResult::new(s.clone());
+    for token in lex {
         if token == Token::Error {
             continue;
         }
-        result.videoCodec = Some(token);
+        result.video_codec = Some(token);
         // dbg!(token);
         // println!("{:?}", token);
     }
