@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "video-filename-parser"
+version = "0.1.0"
+description = ""
+authors = ["sarendsen <168401+sarendsen@users.noreply.github.com>"]
+readme = "README.md"
+# packages = [{include = "video_filename_parser"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[project]
+name = "video_filename_parser"
+
+[build-system]
+requires = ["maturin>=0.14,<0.15"]
+build-backend = "maturin"
+
+# [tool.maturin]
+# bindings = "cffi"
+# compatibility = "linux"
+
+# MACOSX_DEPLOYMENT_TARGET=13.0 maturin build --release --target aarch64-apple-darwin --zig -i python
