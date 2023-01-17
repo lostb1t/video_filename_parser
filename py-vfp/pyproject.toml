@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "video-filename-parser"
+name = "vfp"
 version = "0.1.0"
 description = ""
 authors = ["sarendsen <168401+sarendsen@users.noreply.github.com>"]
@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.11"
 
 [project]
-name = "video_filename_parser"
+name = "vfp"
 
 [build-system]
 requires = ["maturin>=0.14,<0.15"]
