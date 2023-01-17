@@ -119,3 +119,4 @@ fn main() {
     let result = parse("[TaigaSubs]_Toradora!_(2008)_-_01v2_-_Tiger_and_Dragon[1920x1080_H.265_FLAC_5.1_bluray][1234ABCD].mkv".to_string());
     dbg!(result);
 }
+
