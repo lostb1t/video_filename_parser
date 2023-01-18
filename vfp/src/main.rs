@@ -47,7 +47,7 @@ enum Token {
     AudioChannels,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 struct ParseResult {
     title: String,
     video_codec: Option<String>,
@@ -68,9 +68,15 @@ impl ParseResult {
     }
 }
 
+// impl PartialEq for FileInfo {
+//     fn eq(&self, other: &Self) -> bool {
+//         self.path == other.path
+//     }
+// }
+
 // TODO implement an delimiter: Regex(@"(\s|\.|,|_|-|=|\|)+"
 
-fn parse(v: String) -> ParseResult {
+fn parse(v: &String) -> ParseResult {
     let s = v.clone().to_lowercase();
     let mut lex = Token::lexer(&s);
 
@@ -116,6 +122,22 @@ fn parse(v: String) -> ParseResult {
 fn main() {
     //let df = example().unwrap();
     //let result = parse("[TaigaSubs]_Toradora!_(2008)_-_01v2_-_Tiger_and_Dragon_[1920x1080_H.265_FLAC][1234ABCD].mkv".to_string());
-    let result = parse("[TaigaSubs]_Toradora!_(2008)_-_01v2_-_Tiger_and_Dragon[1920x1080_H.265_FLAC_5.1_bluray][1234ABCD].mkv".to_string());
-    dbg!(result);
+    // let result = parse("[TaigaSubs]_Toradora!_(2008)_-_01v2_-_Tiger_and_Dragon[1920x1080_H.265_FLAC_5.1_bluray][1234ABCD].mkv".to_string());
+    // dbg!(result);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn movies() {
+        let title = "Tenet 2020 2160p UHD BluRay DTS-HD MA 5.1 DV x265-LEGi0N".to_string();
+        let result = parse(&title);
+
+        assert_eq!(
+            result,
+            ParseResult { title: title, ..ParseResult::default() }
+        );
+    }
 }
