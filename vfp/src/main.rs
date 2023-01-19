@@ -1,10 +1,6 @@
-use logos::{Lexer, Logos};
+use logos::{Logos};
 use strum_macros::Display;
 
-// #[derive(Debug, Clone, PartialEq, Eq)]
-// struct Element {
-//     kind: VideoCodec
-// }
 
 #[derive(Debug, Clone, PartialEq, Eq, Display)]
 enum VideoCodecKind {
@@ -35,66 +31,57 @@ enum VideoResolutionKind {
     R2160P,
 }
 
-// #[derive(Debug, Clone, PartialEq, Eq, Display)]
-// enum VideoSourceKind {
-//     Workprint,
-//     Cam,
-//     TS,
-//     TC,
-//     R5,
-//     HDrip,
-//     PPVRip,
-//     Preair,
-//     TVRip,
-//     Dsr,
-//     Sdtv,
-//     BluRay,
-//     Webdl,
-//     #[strum(serialize = "8Bit")]
-//     C8Bit,
-// }
-
-// see https://github.com/scttcper/video-filename-parser/blob/master/src/source.ts
 #[derive(Debug, Clone, PartialEq, Eq, Display)]
 enum VideoSourceKind {
     Workprint,
     Cam,
-    TS,
-    TC,
-    PPV,
-    BluRay,
+    Telesync,
+    Telecine,
+    R5,
+    HDRip,
+    PPVRip,
+    Preair,
+    TVRip,
+    DSR,
+    SDTV,
+    DVDscr,
+    BDscr,
+    Webrip,
+    HDTV,
     Webdl,
-    #[strum(serialize = "8Bit")]
-    C8Bit,
+    DVDrip,
+    Remux,
+    BluRay,
 }
 
-// _sources = [
-//     QualityComponent('source', 10, 'workprint', modifier=-8),
-//     QualityComponent('source', 20, 'cam', '(?:hd)?cam', modifier=-7),
-//     QualityComponent('source', 30, 'ts', '(?:hd)?ts|telesync', modifier=-6),
-//     QualityComponent('source', 40, 'tc', 'tc|telecine', modifier=-5),
-//     QualityComponent('source', 50, 'r5', 'r[2-8c]', modifier=-4),
-//     QualityComponent('source', 60, 'hdrip', r'hd[\W_]?rip', modifier=-3),
-//     QualityComponent('source', 70, 'ppvrip', r'ppv[\W_]?rip', modifier=-2),
-//     QualityComponent('source', 80, 'preair', modifier=-1),
-//     QualityComponent('source', 90, 'tvrip', r'tv[\W_]?rip'),
-//     QualityComponent('source', 100, 'dsr', r'dsr|ds[\W_]?rip'),
-//     QualityComponent('source', 110, 'sdtv', r'(?:[sp]dtv|dvb)(?:[\W_]?rip)?'),
-//     QualityComponent('source', 120, 'dvdscr', r'(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
-//     QualityComponent('source', 130, 'bdscr', 'bdscr(?:eener)?'),
-//     QualityComponent('source', 140, 'webrip', r'web[\W_]?rip'),
-//     QualityComponent('source', 150, 'hdtv', r'a?hdtv(?:[\W_]?rip)?'),
-//     QualityComponent('source', 160, 'webdl', r'web(?:[\W_]?(dl|hd))?'),
-//     QualityComponent('source', 170, 'dvdrip', r'dvd(?:[\W_]?rip)?'),
-//     QualityComponent('source', 175, 'remux'),
-//     QualityComponent('source', 180, 'bluray', r'(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)'),
+#[derive(Debug, Clone, PartialEq, Eq, Display)]
+enum VideoColorRangeKind {
+    #[strum(serialize = "8Bit")]
+    C8Bit,
+    #[strum(serialize = "10Bit")]
+    C10Bit,
+    HDRplus,
+    HDR,
+    DolbyVision,
+}
 
-// fn codec(lex: &mut Lexer<Token>) -> Option<VideoCodec> {
-//     let slice = lex.slice();
-//     Some(VideoCodec::H265)
-// }
+#[derive(Debug, Clone, PartialEq, Eq, Display)]
+enum AudioCodecKind {
+    MP3,
+    AAC,
+    #[strum(serialize = "DD5.1")]
+    DD51,
+    AC3,
+    #[strum(serialize = "DD+5.1")]
+    DDPLUS51,
+    FLAC,
+    DTSHD,
+    DTS,
+    TRUEHD
+}
 
 #[derive(Logos, Debug, PartialEq, Clone, Display)]
+#[logos(subpattern year = r"(1[89]|20)\d\d")]
 enum Token {
     #[error(logos::skip)]
     Error,
@@ -117,33 +104,62 @@ enum Token {
     #[regex(r"((3840x)?2160p?x?([56]0)?)|4k", |_| VideoResolutionKind::R2160P)]
     VideoResolution(VideoResolutionKind),
 
-    // // Source
+    // Source
     #[regex(r"(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)", |_| VideoSourceKind::BluRay)]
     #[regex(r"web(?:[\W_]?(dl|hd))?", |_| VideoSourceKind::Webdl)]
-    #[regex(r"8[^\w]?bits?|hi8p?", |_| VideoSourceKind::C8Bit)]
     VideoSource(VideoSourceKind),
-    // // Audio
-    // #[strum(serialize = "MP3")]
-    // #[regex(r"mp3")]
-    // Mp3,
-    // //#[regex(r"flac")]
-    // //#[regex(r"flac%s?", |lex| lex.slice().parse())]
-    // #[regex(r"flac")]
-    // Flac,
 
-    // // Audio Channels
-    // // TODO: Needs work
-    // #[regex(r"([765].?[01])")]
-    // AudioChannels,
+    // Color Range
+    #[regex(r"8[^\w]?bits?|hi8p?", |_| VideoColorRangeKind::C8Bit)]
+    #[regex(r"10[^\w]?bits?|hi10p?", |_| VideoColorRangeKind::C10Bit)]
+    #[regex(r"hdr(10)?[^\w]?(\+|p|plus)", |_| VideoColorRangeKind::HDRplus)]
+    #[regex(r"hdr([^\w]?10)?", |_| VideoColorRangeKind::HDR)]
+    #[regex(r"(dolby[^\w]?vision|dv|dovi)", |_| VideoColorRangeKind::DolbyVision)]
+    VideoColorRange(VideoColorRangeKind),
+
+    // Audio Codec
+    #[regex(r"mp3", |_| AudioCodecKind::MP3)]
+    #[regex(r"aac", |_| AudioCodecKind::AAC)]
+    #[regex(r"dd5.1", |_| AudioCodecKind::DD51)]
+    #[regex(r"ac3", |_| AudioCodecKind::AC3)]
+    #[regex(r"dd[p+]", |_| AudioCodecKind::DDPLUS51)]
+    #[regex(r"flac", |_| AudioCodecKind::FLAC)]
+    #[regex(r"dts[\W_]?hd(?:[\W_]?ma)?", |_| AudioCodecKind::DTSHD)]
+    #[regex(r"dts", |_| AudioCodecKind::DTS)]
+    #[regex(r"truehd", |_| AudioCodecKind::TRUEHD)]
+    AudioCodec(AudioCodecKind),
+
+    // Audio Channels
+    // TODO: Needs work
+    #[regex(r"([765].?[01])")]
+    AudioChannels,
+
+    #[regex(r"(?&year)+", |lex| lex.slice().parse())]
+    Year(i32),
+
+    #[token(".")]
+    Period,
+    // r'(?:series|season|s)\s?(\d{1,4})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?'
+    // % roman_numeral_re,
+    // r'(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
+    // r'(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
+    // r'(\d{1,3})\s?of\s?(?:\d{1,3})',
+    // r'(?:episode|e|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
+    // r'part\s(%s)' % '|'.join(map(str, english_numbers)),
+    // #[regex(r"(?i)s?(?P<short>\d+) ?[ex]|(?:season)(?:[^\d]|$)(?P<long>\d+)|s(?P<dash>\d+) - \d+|\.s(?P<collection>\d){1,2}\.", |lex| lex.slice().parse())]
+    #[regex(r"S\d\dE\d\d", |lex| lex.slice().parse())]
+    Episode(i32),
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 struct ParseResult {
     title: String,
+    year: Option<i32>,
+    episode: Option<i32>,
     video_codec: Option<VideoCodecKind>,
     video_resolution: Option<VideoResolutionKind>,
     video_color_range: Option<String>,
-    audio_codec: Option<String>,
+    audio_codec: Option<AudioCodecKind>,
     audio_channels: Option<String>,
     source: Option<VideoSourceKind>,
     file_name: String,
@@ -158,78 +174,80 @@ impl ParseResult {
     }
 }
 
-// impl PartialEq for FileInfo {
-//     fn eq(&self, other: &Self) -> bool {
-//         self.path == other.path
-//     }
-// }
-
 // TODO implement an delimiter: Regex(@"(\s|\.|,|_|-|=|\|)+"
 
 fn parse(v: &String) -> ParseResult {
-    let s = v.clone().to_lowercase();
+    let s = &v.clone().to_lowercase();
     let mut lex = Token::lexer(&s);
     let mut result = ParseResult::new(v.clone());
-
+    
     while let Some(token) = lex.next() {
-        if token == Token::Error {
-            continue;
-        }
-
-        //let token_string = Some(token.to_string());
-        //let token_string = Some(token.into());
-
         match token {
             Token::VideoCodec(value) => {
-                // result.video_codec = Some(value.to_string());
                 result.video_codec = Some(value);
             }
             Token::VideoResolution(value) => {
-                //result.video_resolution = Some(value.to_string());
                 result.video_resolution = Some(value);
             }
             Token::VideoSource(value) => {
-                //result.source = Some(value.to_string());
                 result.source = Some(value);
+            }
+            Token::AudioCodec(value) => {
+                result.audio_codec = Some(value);
+            }
+            Token::AudioCodec(value) => {
+                result.audio_codec = Some(value);
+            }
+            Token::Year(value) => {
+                result.year = Some(value);
+            }
+            Token::Episode(value) => {
+                result.episode = Some(value);
             }
             _ => (),
         }
-        // dbg!(token);
-
-        // dbg!(VideoCodecKind::R1080P);
-        // dbg!(token);
-        // println!("{:?}", token);
     }
     result
-}
-
-fn main() {
-    //let df = example().unwrap();
-    //let result = parse("[TaigaSubs]_Toradora!_(2008)_-_01v2_-_Tiger_and_Dragon_[1920x1080_H.265_FLAC][1234ABCD].mkv".to_string());
-    let result = parse(&"[TaigaSubs]_Toradora!_(2008)_-_01v2_-_Tiger_and_Dragon[1920x1080_H.265_FLAC_5.1_blu-ray][1234ABCD].mkv".to_string());
-    dbg!(result);
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     #[cfg(test)]
-    use pretty_assertions::{assert_eq, assert_ne};
+    use pretty_assertions::{assert_eq};
 
     #[test]
-    fn movies() {
-        let title = "Tenet 2020 2160p UHD Webdl DTS-HD MA 5.1 DV x265-LEGi0N".to_string();
-        let result = parse(&title);
-
-        assert_eq!(
-            result,
-            ParseResult {
-                file_name: title,
-                video_codec: Some(VideoCodecKind::H265),
-                video_resolution: Some(VideoResolutionKind::R2160P),
-                source: Some(VideoSourceKind::Webdl),
-                ..ParseResult::default()
-            }
-        );
+    fn generic_test() {
+        let entries: Vec<ParseResult> = vec![ParseResult {
+            file_name: "Tenet 2020 2160p UHD Webdl DTS-HD MA 5.1 x265-LEGi0N".to_string(),
+            year: Some(2020),
+            video_codec: Some(VideoCodecKind::H265),
+            video_resolution: Some(VideoResolutionKind::R2160P),
+            source: Some(VideoSourceKind::Webdl),
+            audio_codec: Some(AudioCodecKind::DTSHD),
+            ..ParseResult::default()
+        },
+        ParseResult {
+            file_name: "Tenet.2020.2160p.UHD.Webdl.dd5.1.x265-LEGi0N".to_string(),
+            year: Some(2020),
+            video_codec: Some(VideoCodecKind::H265),
+            video_resolution: Some(VideoResolutionKind::R2160P),
+            source: Some(VideoSourceKind::Webdl),
+            audio_codec: Some(AudioCodecKind::DD51),
+            ..ParseResult::default()
+        },
+        ParseResult {
+            file_name: "Sons.of.Anarchy.S03.720p.BluRay-CLUEREWARD".to_string(),
+            video_resolution: Some(VideoResolutionKind::R720P),
+            source: Some(VideoSourceKind::BluRay),
+            ..ParseResult::default()
+        }];
+        for entry in entries {
+            let result = parse(&entry.file_name);
+            assert_eq!(
+                result,
+                entry
+            );
+        }
     }
 }
