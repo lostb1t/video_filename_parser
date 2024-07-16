@@ -106,6 +106,7 @@ enum Token {
 
     // Source
     #[regex(r"(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)", |_| VideoSourceKind::BluRay)]
+    #[regex(r"bluray?", |_| VideoSourceKind::BluRay)]
     #[regex(r"web(?:[\W_]?(dl|hd))?", |_| VideoSourceKind::Webdl)]
     VideoSource(VideoSourceKind),
 
@@ -237,7 +238,7 @@ mod tests {
             ..ParseResult::default()
         },
         ParseResult {
-            file_name: "Sons.of.Anarchy.S03.720p.BluRay-CLUEREWARD".to_string(),
+            file_name: "Sons.of.Anarchy.S03.720p.BluRay.CLUEREWARD".to_string(),
             video_resolution: Some(VideoResolutionKind::R720P),
             source: Some(VideoSourceKind::BluRay),
             ..ParseResult::default()
